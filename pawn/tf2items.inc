@@ -195,11 +195,13 @@ native float TF2Items_GetAttributeValue(Handle item, int slot);
  * @param client          Client Index.
  * @param classname       The classname of the entity that will be generated.
  * @param itemDefIndex    Item definition index.
+ * @param forceRequested  Whether TF2 wanted to force this give (useful if you want to match using FORCE_GENERATION).
+ * @param forced          _Post: Was Item creation forced?
  * @param item            Handle to a TF2Item object wich describes what values will be overriden.
  */
-forward Action TF2Items_OnGiveNamedItem(int client, char[] classname, int itemDefIndex, Handle &item);
+forward Action TF2Items_OnGiveNamedItem(int client, char[] classname, int itemDefIndex, bool forceRequested, Handle &item);
 
-forward void TF2Items_OnGiveNamedItem_Post(int client, char[] classname, int itemDefIndex, int level, int quality, int entity);
+forward void TF2Items_OnGiveNamedItem_Post(int client, char[] classname, int itemDefIndex, bool forced, int level, int quality, int entity);
 
 /**
  * Do not edit below this line!

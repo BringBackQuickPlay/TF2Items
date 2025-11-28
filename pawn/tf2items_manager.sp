@@ -60,7 +60,7 @@ public void OnPluginStart() {
  *
  * When an item is about to be given to a client.
  * -------------------------------------------------------------------------- */
-public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int itemDefIndex, Handle &override) {
+public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int itemDefIndex, bool forceRequested, Handle &override) {
 	// If disabled, use the default values.
 	if (!GetConVarBool(g_hCvarEnabled) || (GetConVarBool(g_hCvarPlayerControlEnabled) && !g_bPlayerEnabled[client]))
 		return Plugin_Continue;

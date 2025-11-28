@@ -170,6 +170,7 @@ CBaseEntity *Hook_GiveNamedItem(char const *szClassname, int iSubType, CEconItem
 	g_pForwardGiveItem->PushCell(client);
 	g_pForwardGiveItem->PushString(szClassname);
 	g_pForwardGiveItem->PushCell(cscript->m_iItemDefinitionIndex);
+	g_pForwardGiveItem->PushCell(b ? 1 : 0);
 	g_pForwardGiveItem->PushCellByRef(&cellOverrideHandle);
 	g_pForwardGiveItem->Execute(&cellResults);
 
@@ -267,6 +268,7 @@ CBaseEntity *Hook_GiveNamedItem_Post(char const *szClassname, int iSubType, CEco
 	g_pForwardGiveItem_Post->PushCell(client);
 	g_pForwardGiveItem_Post->PushString(szClassname);
 	g_pForwardGiveItem_Post->PushCell(cscript->m_iItemDefinitionIndex);
+	g_pForwardGiveItem_Post->PushCell(b ? 1 : 0);
 	g_pForwardGiveItem_Post->PushCell(cscript->m_iEntityLevel);
 	g_pForwardGiveItem_Post->PushCell(cscript->m_iEntityQuality);
 	g_pForwardGiveItem_Post->PushCell(iEntityIndex);
@@ -493,8 +495,8 @@ bool TF2Items::SDK_OnLoad(char *error, size_t maxlen, bool late) {
 	g_ScriptedItemOverrideHandleType = g_pHandleSys->CreateType("TF2ItemType", &g_ScriptedItemOverrideHandler, 0, NULL, NULL, myself->GetIdentity(), NULL);
 
 	// Create forwards
-	g_pForwardGiveItem = g_pForwards->CreateForward("TF2Items_OnGiveNamedItem", ET_Hook, 4, NULL, Param_Cell, Param_String, Param_Cell, Param_CellByRef);
-	g_pForwardGiveItem_Post = g_pForwards->CreateForward("TF2Items_OnGiveNamedItem_Post", ET_Ignore, 6, NULL, Param_Cell, Param_String, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
+	g_pForwardGiveItem = g_pForwards->CreateForward("TF2Items_OnGiveNamedItem", ET_Hook, 5, NULL, Param_Cell, Param_String, Param_Cell, Param_Cell, Param_CellByRef);
+	g_pForwardGiveItem_Post = g_pForwards->CreateForward("TF2Items_OnGiveNamedItem_Post", ET_Ignore, 7, NULL, Param_Cell, Param_String, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 
 	return true;
 }
@@ -640,8 +642,9 @@ static cell_t TF2Items_GiveNamedItem(IPluginContext *pContext, const cell_t *par
 #endif
 
 	// Call the function.
+	bool forced = ((pScriptedItemOverride->m_bFlags & FORCE_GENERATION) == FORCE_GENERATION);
 	CBaseEntity *tempItem = NULL;
-	tempItem = SH_MCALL(pEntity, MHook_GiveNamedItem)(strWeaponClassname, 0, &hScriptCreatedItem, ((pScriptedItemOverride->m_bFlags & FORCE_GENERATION) == FORCE_GENERATION));
+	tempItem = SH_MCALL(pEntity, MHook_GiveNamedItem)(strWeaponClassname, 0, &hScriptCreatedItem, forced);
 
 	if (tempItem == NULL)
 	{
@@ -668,6 +671,7 @@ static cell_t TF2Items_GiveNamedItem(IPluginContext *pContext, const cell_t *par
 	g_pForwardGiveItem_Post->PushCell(params[1]);
 	g_pForwardGiveItem_Post->PushString(strWeaponClassname);
 	g_pForwardGiveItem_Post->PushCell(hScriptCreatedItem.m_iItemDefinitionIndex);
+	g_pForwardGiveItem_Post->PushCell(forced ? 1 : 0);
 	g_pForwardGiveItem_Post->PushCell(hScriptCreatedItem.m_iEntityLevel);
 	g_pForwardGiveItem_Post->PushCell(hScriptCreatedItem.m_iEntityQuality);
 	g_pForwardGiveItem_Post->PushCell(entIndex);
